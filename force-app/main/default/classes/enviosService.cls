@@ -76,32 +76,44 @@ global with sharing class enviosService {
 
     public static enviosServiceResponse.envioResponse comprobarCamposObligatorios(enviosServiceRequest.envioRequest request){
         Integer code = EnvioConstantes.CODEOK;
-        String msg = EnvioConstantes.MSGOK;
+        String msg;
         if(request.fecha_envio == null){
             code = EnvioConstantes.CODEKO;
-            msg = EnvioConstantes.NOFECHA;
-        }else if(request.id_producto == null){
+            msg = msg + ' ' +  EnvioConstantes.NOFECHA;
+        }
+        
+        if(request.id_producto == null){
             code = EnvioConstantes.CODEKO;
-            msg = EnvioConstantes.NOPRODUCTO;
+            msg = msg + ' ' +   EnvioConstantes.NOPRODUCTO;
 
-        }else if(request.descripcion_producto == null){
+        }
+        
+        if(request.descripcion_producto == null){
             code = EnvioConstantes.CODEKO;
-            msg = EnvioConstantes.NODESCRIPCION;
+            msg = msg + ' ' +   EnvioConstantes.NODESCRIPCION;
 
-        } else if(request.cantidad == null){
+        }
+        
+        if(request.cantidad == null){
             code = EnvioConstantes.CODEKO;
-            msg = EnvioConstantes.NOCANTIDAD;
+            msg = msg + ' ' +   EnvioConstantes.NOCANTIDAD;
 
-        }else if(request.almacen_destino == null){
+        }
+        
+        if(request.almacen_destino == null){
             code = EnvioConstantes.CODEKO;
-            msg = EnvioConstantes.NOALMACEN;
+            msg = msg + ' ' +   EnvioConstantes.NOALMACEN;
 
         }else if(request.almacen_destino != 'BCN' && request.almacen_destino != 'MAD' && request.almacen_destino !=  'VLN' && request.almacen_destino != 'SEV'){
             code = EnvioConstantes.CODEKO;
-            msg = EnvioConstantes.ALMACENINCORRECTO;
+            msg = msg + ' ' +   EnvioConstantes.ALMACENINCORRECTO;
 
         }
 
+
+        if(msg == null){
+            msg = EnvioConstantes.MSGOK;
+        }
 
         enviosServiceResponse.envioResponse response = new enviosServiceResponse.envioResponse();
         response.code_result = code;
