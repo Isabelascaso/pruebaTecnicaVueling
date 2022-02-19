@@ -1,0 +1,3 @@
+Se ha creado este nuevo producto: {!Producto__c.Codigo_de_producto__c}. Apruebe este nuevo producto.
+Gracias.
+{!ApprovalRequest.External_URL}
