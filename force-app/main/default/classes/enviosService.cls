@@ -68,6 +68,11 @@ global with sharing class enviosService {
             System.debug('Exception ' + e);
             System.debug('Exception message' + e.getMessage());
             System.debug('Exception line' + e.getLineNumber());
+
+            for(enviosServiceResponse.envioResponse resp : response.envios){
+                resp.code_result = EnvioConstantes.CODEKO500;
+                resp.msg_result = e.getMessage();
+            }
         }
         
         return JSON.serialize(response);

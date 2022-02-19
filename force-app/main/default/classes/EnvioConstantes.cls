@@ -7,6 +7,7 @@ public with sharing class EnvioConstantes {
    public static final String ALMACENINCORRECTO = 'El almacen de destino es incorrecto.';
    public static final Integer CODEOK = 200;
    public static final Integer CODEKO = 400;
+   public static final Integer CODEKO500 = 500;
    public static final String MSGOK = 'La solicitud ha llegado correctamente.';
    public static final String BCN = 'BCN';
    public static final String MAD = 'MAD';
