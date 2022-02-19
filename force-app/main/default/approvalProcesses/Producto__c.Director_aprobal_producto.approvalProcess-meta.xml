@@ -10,6 +10,7 @@
         <field>Name</field>
         <field>Owner</field>
         <field>Aprobal_Estado__c</field>
+        <field>Codigo_de_producto__c</field>
     </approvalPageFields>
     <approvalStep>
         <allowDelegate>false</allowDelegate>
