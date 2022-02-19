@@ -8,4 +8,8 @@ public with sharing class EnvioConstantes {
    public static final Integer CODEOK = 200;
    public static final Integer CODEKO = 400;
    public static final String MSGOK = 'La solicitud ha llegado correctamente.';
+   public static final String BCN = 'BCN';
+   public static final String MAD = 'MAD';
+   public static final String VLN = 'VLN';
+   public static final String SEV = 'SEV';
 }

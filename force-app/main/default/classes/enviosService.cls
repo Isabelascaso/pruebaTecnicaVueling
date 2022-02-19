@@ -104,7 +104,7 @@ global with sharing class enviosService {
             code = EnvioConstantes.CODEKO;
             msg = msg + ' ' +   EnvioConstantes.NOALMACEN;
 
-        }else if(request.almacen_destino != 'BCN' && request.almacen_destino != 'MAD' && request.almacen_destino !=  'VLN' && request.almacen_destino != 'SEV'){
+        }else if(request.almacen_destino != EnvioConstantes.BCN && request.almacen_destino != EnvioConstantes.MAD && request.almacen_destino !=  EnvioConstantes.VLN && request.almacen_destino != EnvioConstantes.SEV){
             code = EnvioConstantes.CODEKO;
             msg = msg + ' ' +   EnvioConstantes.ALMACENINCORRECTO;
 
