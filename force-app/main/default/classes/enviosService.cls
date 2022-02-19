@@ -75,30 +75,30 @@ global with sharing class enviosService {
     }
 
     public static enviosServiceResponse.envioResponse comprobarCamposObligatorios(enviosServiceRequest.envioRequest request){
-        Integer code = 200;
-        String msg = 'La solicitud ha llegado correctamente';
+        Integer code = EnvioConstantes.CODEOK;
+        String msg = EnvioConstantes.MSGOK;
         if(request.fecha_envio == null){
-            code = 400;
-            msg = 'Falta por rellenar la fecha de envio';
+            code = EnvioConstantes.CODEKO;
+            msg = EnvioConstantes.NOFECHA;
         }else if(request.id_producto == null){
-            code = 400;
-            msg = 'Falta por rellenar el id de producto';
+            code = EnvioConstantes.CODEKO;
+            msg = EnvioConstantes.NOPRODUCTO;
 
         }else if(request.descripcion_producto == null){
-            code = 400;
-            msg = 'Falta por rellenar la descripcion del producto';
+            code = EnvioConstantes.CODEKO;
+            msg = EnvioConstantes.NODESCRIPCION;
 
         } else if(request.cantidad == null){
-            code = 400;
-            msg = 'Falta por rellenar la cantidad';
+            code = EnvioConstantes.CODEKO;
+            msg = EnvioConstantes.NOCANTIDAD;
 
         }else if(request.almacen_destino == null){
-            code = 400;
-            msg = 'Falta por rellenar el almacen de destino';
+            code = EnvioConstantes.CODEKO;
+            msg = EnvioConstantes.NOALMACEN;
 
         }else if(request.almacen_destino != 'BCN' && request.almacen_destino != 'MAD' && request.almacen_destino !=  'VLN' && request.almacen_destino != 'SEV'){
-            code = 400;
-            msg = 'El almacen de destino es incorrecto';
+            code = EnvioConstantes.CODEKO;
+            msg = EnvioConstantes.ALMACENINCORRECTO;
 
         }
 
