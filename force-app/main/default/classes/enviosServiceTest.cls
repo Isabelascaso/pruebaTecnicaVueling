@@ -20,6 +20,12 @@ public with sharing class enviosServiceTest {
         Test.StartTest();
         String response = enviosService.doPost();
         Test.StopTest();
+
+        List<Producto__c> productList = new List<Producto__c>();
+        if(Schema.sObjectType.Producto__c.isAccessible()){
+            productList = [SELECT id, Codigo_de_producto__c FROM Producto__c];
+        }
+        System.assertEquals(1, productList.size(), 'No existe el numero correcto de productos');
     }
 
     @isTest
@@ -35,5 +41,46 @@ public with sharing class enviosServiceTest {
         Test.StartTest();
         String response = enviosService.doPost();
         Test.StopTest();
+
+        List<Producto__c> productList = new List<Producto__c>();
+        if(Schema.sObjectType.Producto__c.isAccessible()){
+            productList = [SELECT id, Codigo_de_producto__c FROM Producto__c];
+        }
+        System.assertEquals(2, productList.size(), 'No existe el numero correcto de productos');
+    }
+
+    @isTest
+    static void comprobarCamposObligatoriosNullTest(){
+        enviosServiceRequest.envioRequest request = new enviosServiceRequest.envioRequest();
+        request.fecha_envio = null;
+        request.id_producto  = null;
+        request.descripcion_producto  = null;
+        request.cantidad  = null;
+        request.almacen_destino = null;
+       
+
+        Test.StartTest();
+        enviosServiceResponse.envioResponse response = enviosService.comprobarCamposObligatorios(request);
+        Test.StopTest();
+
+        
+        System.assertEquals(400, response.code_result, 'No es el response esperado');
+    }
+
+    @isTest
+    static void comprobarCamposObligatorioIncorrectoTest(){
+        enviosServiceRequest.envioRequest request = new enviosServiceRequest.envioRequest();
+        request.fecha_envio = null;
+        request.id_producto  = null;
+        request.descripcion_producto  = null;
+        request.cantidad  = null;
+        request.almacen_destino = 'null';
+       
+
+        Test.StartTest();
+        enviosServiceResponse.envioResponse response = enviosService.comprobarCamposObligatorios(request);
+        Test.StopTest();
+
+        System.assertEquals(400, response.code_result, 'No es el response esperado');
     }
 }
