@@ -19,55 +19,94 @@ global with sharing class enviosService {
             System.debug('rw ' +requestWrapper);
             
             Set<String> productSet = new Set<String>();
-            Map<String, enviosServiceRequest.envioRequest> productEnviosMap = new Map<String, enviosServiceRequest.envioRequest>();
+            response.envios = new List<enviosServiceResponse.envioResponse>();
+
             for(enviosServiceRequest.envioRequest request : requestWrapper.envios){
-                productSet.add(request.id_producto);
-                productEnviosMap.put(request.id_producto, request);
+                enviosServiceResponse.envioResponse responseActual = comprobarCamposObligatorios(request);
+                response.envios.add(responseActual);
+
+                if(responseActual.code_result == 200){
+                    productSet.add(request.id_producto);
+                }
             }
 
             Map<String, Id> productCodeIdMap = getProductMap(productSet);
-
             List<Producto__c> productosCrear = new List<Producto__c>();
-            List<Envio__c> enviosCrear = new List<Envio__c>();
-            for(enviosServiceRequest.envioRequest request : requestWrapper.envios){
-                Id productCode = productCodeIdMap.get(request.id_producto);
+
+            for(String productId : productSet){
 
                 Producto__c producto = new Producto__c();
-                if(productCode == null){
-                    producto.Codigo_de_producto__c = request.id_producto;
+                if(productCodeIdMap.get(productId) == null){
+                    producto.Codigo_de_producto__c = productId;
                     productosCrear.add(producto);
-                }else{
-                    enviosCrear.add(crearEnvio(productCode, request, traza));
                 }
 
+            }
 
+            List<Envio__c> enviosCrear = new List<Envio__c>();
+            Integer interator = 0;
+            for(enviosServiceRequest.envioRequest request : requestWrapper.envios){
+                enviosServiceResponse.envioResponse responseActual= response.envios.get(interator);
+
+                if(responseActual.code_result== 200){
+                    enviosCrear.add(crearEnvio( request.id_producto, request, traza));
+                }
+
+                interator++;
             }
             
-            if(Schema.sObjectType.Producto__c.isCreateable()){
+            if(Schema.sObjectType.Producto__c.isCreateable() && productosCrear.size() > 0){
                 insert productosCrear;
             }
 
-            for(Producto__c producto : productosCrear){
-                enviosCrear.add(crearEnvio(producto.id, productEnviosMap.get(producto.Codigo_de_producto__c), traza));
-            }
-
-            if(Schema.sObjectType.Envio__c.isCreateable()){
+            if(Schema.sObjectType.Envio__c.isCreateable() && enviosCrear.size() > 0){
                 insert enviosCrear;
             }
     
            
-            response.code_result = 200;
-            response.msg_result = 'Ok';
         }catch (Exception e){
             System.debug('Exception ' + e);
             System.debug('Exception message' + e.getMessage());
             System.debug('Exception line' + e.getLineNumber());
-            response.code_result = 500;
-            response.msg_result = e.getMessage();
         }
         
         return JSON.serialize(response);
        
+    }
+
+    public static enviosServiceResponse.envioResponse comprobarCamposObligatorios(enviosServiceRequest.envioRequest request){
+        Integer code = 200;
+        String msg = 'La solicitud ha llegado correctamente';
+        if(request.fecha_envio == null){
+            code = 400;
+            msg = 'Falta por rellenar la fecha de envio';
+        }else if(request.id_producto == null){
+            code = 400;
+            msg = 'Falta por rellenar el id de producto';
+
+        }else if(request.descripcion_producto == null){
+            code = 400;
+            msg = 'Falta por rellenar la descripcion del producto';
+
+        } else if(request.cantidad == null){
+            code = 400;
+            msg = 'Falta por rellenar la cantidad';
+
+        }else if(request.almacen_destino == null){
+            code = 400;
+            msg = 'Falta por rellenar el almacen de destino';
+
+        }else if(request.almacen_destino != 'BCN' && request.almacen_destino != 'MAD' && request.almacen_destino !=  'VLN' && request.almacen_destino != 'SEV'){
+            code = 400;
+            msg = 'El almacen de destino es incorrecto';
+
+        }
+
+
+        enviosServiceResponse.envioResponse response = new enviosServiceResponse.envioResponse();
+        response.code_result = code;
+        response.msg_result = msg;
+        return response;
     }
 
     public static Map<String, Id> getProductMap(Set<String> productSet){
@@ -84,10 +123,13 @@ global with sharing class enviosService {
         return productCodeIdMap;
     }
 
-    public static Envio__c crearEnvio(Id productId, enviosServiceRequest.envioRequest request, Trazabilidad__c traza){
+    public static Envio__c crearEnvio(String productId, enviosServiceRequest.envioRequest request, Trazabilidad__c traza){
+        Producto__c producto = new Producto__c();
+        producto.Codigo_de_producto__c = productId;
+
         Envio__c envio = new Envio__c();
         envio.Fecha_de_envio__c = request.fecha_envio;
-        envio.Producto__c = productId;
+        envio.Producto__r = producto;
         envio.Cantidad__c = request.cantidad;
         envio.Almacen_de_destino__c = request.almacen_destino;
         envio.jsonService__c = JSON.serialize(request);
