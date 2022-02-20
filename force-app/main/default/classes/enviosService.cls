@@ -4,6 +4,9 @@ global with sharing class enviosService {
     @HttpPost
     global static String doPost() {
         enviosServiceResponse response = new enviosServiceResponse();
+        response.envios = new List<enviosServiceResponse.envioResponse>();
+        
+        Savepoint sp = Database.setSavepoint();
         try{
             RestRequest req = RestContext.request;
             Blob body = req.requestBody;
@@ -16,10 +19,8 @@ global with sharing class enviosService {
             }
     
             enviosServiceRequest requestWrapper = (enviosServiceRequest)JSON.deserialize(requestString,enviosServiceRequest.class);
-            System.debug('rw ' +requestWrapper);
             
             Set<String> productSet = new Set<String>();
-            response.envios = new List<enviosServiceResponse.envioResponse>();
 
             for(enviosServiceRequest.envioRequest request : requestWrapper.envios){
                 enviosServiceResponse.envioResponse responseActual = comprobarCamposObligatorios(request);
@@ -66,13 +67,19 @@ global with sharing class enviosService {
            
         }catch (Exception e){
             System.debug('Exception ' + e);
-            System.debug('Exception message' + e.getMessage());
-            System.debug('Exception line' + e.getLineNumber());
+            System.debug('Exception message ' + e.getMessage());
+            System.debug('Exception line ' + e.getLineNumber());
 
+            if(response.envios.size() == 0){
+                response.envios.add(new enviosServiceResponse.envioResponse());
+            }
+            
             for(enviosServiceResponse.envioResponse resp : response.envios){
                 resp.code_result = EnvioConstantes.CODEKO500;
                 resp.msg_result = e.getMessage();
             }
+
+            Database.rollback(sp);
         }
         
         return JSON.serialize(response);
@@ -81,7 +88,7 @@ global with sharing class enviosService {
 
     public static enviosServiceResponse.envioResponse comprobarCamposObligatorios(enviosServiceRequest.envioRequest request){
         Integer code = EnvioConstantes.CODEOK;
-        String msg;
+        String msg = '';
         if(request.fecha_envio == null){
             code = EnvioConstantes.CODEKO;
             msg = msg + ' ' +  EnvioConstantes.NOFECHA;
@@ -116,7 +123,7 @@ global with sharing class enviosService {
         }
 
 
-        if(msg == null){
+        if(msg == ''){
             msg = EnvioConstantes.MSGOK;
         }
 

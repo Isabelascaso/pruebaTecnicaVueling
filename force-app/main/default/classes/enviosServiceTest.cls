@@ -50,6 +50,27 @@ public with sharing class enviosServiceTest {
     }
 
     @isTest
+    static void doPostExceptionTest(){
+        String jsonString = '{ "envios":[{"fecha_envio":"2021/09/22","id_producto":"mesa","descripcion_Producto":"prod 1","cantidad":1,"almacen_Destino":"BCN"}  ]}';
+        
+        RestContext.request = new RestRequest();
+        RestContext.response = new RestResponse();
+        RestContext.request.requestURI = '/ColaEnvios/*';
+        RestContext.request.requestBody = Blob.valueof(jsonString);
+        RestContext.request.httpMethod = 'POST';
+
+        Test.StartTest();
+        String response = enviosService.doPost();
+        Test.StopTest();
+
+        List<Trazabilidad__c> trazabilidadList = new List<Trazabilidad__c>();
+        if(Schema.sObjectType.Producto__c.isAccessible()){
+            trazabilidadList = [SELECT id FROM Trazabilidad__c];
+        }
+        System.assertEquals(0, trazabilidadList.size(), 'NO ha entrado en la exception');
+    }
+
+    @isTest
     static void comprobarCamposObligatoriosNullTest(){
         enviosServiceRequest.envioRequest request = new enviosServiceRequest.envioRequest();
         request.fecha_envio = null;
